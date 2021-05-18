@@ -53,11 +53,7 @@ module.exports = class Email {
     //3)) create a transport and send email
     // this.newTransport();
 
-    try {
-      await this.newTransport().sendMail(mailOptions);
-    } catch (err) {
-      console.log('sendmailerror', err);
-    }
+    await this.newTransport().sendMail(mailOptions);
   }
 
   async sendWelcome() {
