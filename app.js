@@ -12,7 +12,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
-const cors=require('cors');
+const cors = require('cors');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -21,6 +21,8 @@ const userRouter = require('./Routes/UserRoutes');
 const reviewRouter = require('./Routes/reviewRoutes');
 const bookingRouter = require('./Routes/bookingRoutes');
 const viewRouter = require('./Routes/viewRoutes');
+
+const bookingController = require('./controllers/bookingController');
 
 app.enable('trust proxy');
 
@@ -32,8 +34,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(cors());
 //Access-control-Allow-Origin *
 
-app.options('*',cors());//for non simple request like patch,delete,etc
-
+app.options('*', cors()); //for non simple request like patch,delete,etc
 
 //set security http headers
 app.use(helmet());
@@ -50,6 +51,13 @@ const limiter = rateLimit({
 });
 //rate limiter
 app.use('/api', limiter);
+
+//webhook stripe
+app.post(
+  '/webhook-checkout',
+  express.raw({ type: 'application/json' }),
+  bookingController.webhookCheckout
+);
 
 //Body parser,reading data from body into req.body
 app.use(express.json({ limit: '10kb' }));
